@@ -147,7 +147,8 @@ class OpenMeteoProvider(WeatherProvider):
         for attempt in range(retries):
             try:
                 with httpx.Client(timeout=self.timeout) as client:
-                    resp = client.get(self.base_url, params=params)
+                    headers = {"User-Agent": "WeatherTruckRouting/1.0", "Accept": "application/json"}
+                    resp = client.get(self.base_url, params=params, headers=headers)
 
                     if resp.status_code in (429, 500, 502, 503, 504):
                         logger.warning(

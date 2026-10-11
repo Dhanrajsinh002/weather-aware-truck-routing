@@ -75,7 +75,8 @@ class OsrmProvider(RoutingProvider):
         for attempt in range(2):
             try:
                 with httpx.Client(timeout=self.timeout) as client:
-                    resp = client.get(url)
+                    headers = {"User-Agent": "WeatherTruckRouting/1.0", "Accept": "application/json"}
+                    resp = client.get(url, headers=headers)
 
                     if resp.status_code == 400:
                         raise NoRouteFoundError(f"OSRM invalid coordinate or unroutable: {resp.text}")

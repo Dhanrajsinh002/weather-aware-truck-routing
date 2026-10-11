@@ -99,7 +99,8 @@ class ValhallaProvider(RoutingProvider):
         for attempt in range(2):
             try:
                 with httpx.Client(timeout=self.timeout) as client:
-                    resp = client.post(self.base_url, json=payload)
+                    headers = {"User-Agent": "WeatherTruckRouting/1.0", "Content-Type": "application/json"}
+                    resp = client.post(self.base_url, json=payload, headers=headers)
 
                     if resp.status_code == 400:
                         raise NoRouteFoundError(f"Valhalla bad request: {resp.text}")

@@ -1,0 +1,36 @@
+{
+  "code": "Ok",
+  "routes": [
+    {
+      "geometry": {
+        "coordinates": [
+          [-87.6298, 41.8781],
+          [-95.9345, 41.2565],
+          [-104.9903, 39.7392]
+        ],
+        "type": "LineString"
+      },
+      "legs": [],
+      "weight_name": "routability",
+      "weight": 54000.0,
+      "duration": 54000.0,
+      "distance": 1614500.0
+    },
+    {
+      "geometry": {
+        "coordinates": [
+          [-87.6298, 41.8781],
+          [-94.5786, 39.0997],
+          [-104.9903, 39.7392]
+        ],
+        "type": "LineString"
+      },
+      "legs": [],
+      "weight_name": "routability",
+      "weight": 57000.0,
+      "duration": 57000.0,
+      "distance": 1690000.0
+    }
+  ],
+  "waypoints": []
+}

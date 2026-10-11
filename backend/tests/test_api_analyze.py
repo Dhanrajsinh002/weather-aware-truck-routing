@@ -200,3 +200,35 @@ def test_analyze_weather_service_error(api_client, monkeypatch):
     assert resp.status_code == 502
     assert resp.json()["error"]["code"] == "UPSTREAM"
     assert resp.json()["error"]["provider"] == "weather"
+
+
+def test_analyze_no_route_human_readable_error(api_client, monkeypatch):
+    from backend.api import views
+    from backend.providers.base import NoRouteFoundError
+
+    class UnroutableRouteService:
+        def get_diverse_routes(self, origin, destination, weight_lb):
+            raise NoRouteFoundError("No viable driving route could be found between the selected locations. Please check your origin and destination.")
+
+    analyze_svc = views.AnalyzeService(route_service=UnroutableRouteService())
+    monkeypatch.setattr(views, "analyze_service", analyze_svc)
+
+    dep_time = (datetime.now(timezone.utc) + timedelta(hours=2)).strftime("%Y-%m-%dT%H:%M:%SZ")
+    payload = {
+        "origin": {"lat": 0.0, "lng": 0.0, "label": "Middle of Atlantic Ocean"},
+        "destination": {"lat": 39.74, "lng": -104.99, "label": "Denver"},
+        "departure_time": dep_time,
+        "load_weight_lb": 35000,
+        "checkpoint_interval_miles": 25,
+    }
+
+    resp = api_client.post("/api/analyze/", payload, format="json")
+    assert resp.status_code == 422
+    data = resp.json()
+    assert data["error"]["code"] == "NO_ROUTE"
+    assert "No viable driving route could be found" in data["error"]["message"]
+    # Ensure raw provider JSON or technical stack traces are not leaked
+    assert "OSRM" not in data["error"]["message"]
+    assert "Valhalla" not in data["error"]["message"]
+    assert "{" not in data["error"]["message"]
+

@@ -15,7 +15,7 @@ from backend.core.risk import classify_checkpoint
 from backend.core.sampling import auto_interval, sample_checkpoints
 from backend.core.types import LatLng, RiskLevel, Route
 from backend.core.weather_interp import HourlySeries, interpolate_weather_at_time
-from backend.providers.base import WeatherProvider
+from backend.providers.base import NoRouteFoundError, WeatherProvider
 from backend.providers.fixture_weather import FixtureWeatherProvider
 from backend.providers.open_meteo import OpenMeteoProvider, round_coord
 from backend.services.routes import RouteService
@@ -82,7 +82,9 @@ class AnalyzeService:
         routes = self.route_service.get_diverse_routes(origin, destination, load_weight_lb)
 
         if not routes:
-            raise ValueError("No route options found")
+            raise NoRouteFoundError(
+                "No viable driving route could be found between the selected locations. Please check your origin and destination."
+            )
 
         # 2. Determine sampling interval
         chosen_interval: int

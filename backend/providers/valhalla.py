@@ -103,9 +103,20 @@ class ValhallaProvider(RoutingProvider):
                     resp = client.post(self.base_url, json=payload, headers=headers)
 
                     if resp.status_code == 400:
-                        raise NoRouteFoundError(f"Valhalla bad request: {resp.text}")
+                        try:
+                            err_data = resp.json()
+                            msg = str(err_data.get("error", err_data.get("status_message", "")))
+                        except Exception:
+                            msg = ""
+                        if "no route" in msg.lower() or "unroutable" in msg.lower():
+                            raise NoRouteFoundError(
+                                "No viable truck route could be found between the selected locations."
+                            )
+                        raise NoRouteFoundError(
+                            "Selected coordinates are unroutable or invalid for truck routing."
+                        )
                     if resp.status_code >= 500:
-                        raise RoutingError(f"Valhalla server error: {resp.status_code}")
+                        raise RoutingError("Truck routing service is temporarily unavailable.")
 
                     resp.raise_for_status()
                     data = resp.json()
@@ -118,6 +129,7 @@ class ValhallaProvider(RoutingProvider):
                 raise
             except Exception as e:
                 logger.error("Valhalla unexpected error: %s", e)
-                raise RoutingError(f"Valhalla routing failed: {e}") from e
+                raise RoutingError("Truck routing service request failed.") from e
 
-        raise RoutingError(f"Valhalla unavailable after retry: {last_err}")
+        raise RoutingError("Truck routing service is temporarily unreachable.")
+

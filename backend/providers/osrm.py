@@ -79,9 +79,22 @@ class OsrmProvider(RoutingProvider):
                     resp = client.get(url, headers=headers)
 
                     if resp.status_code == 400:
-                        raise NoRouteFoundError(f"OSRM invalid coordinate or unroutable: {resp.text}")
+                        try:
+                            err_data = resp.json()
+                            code = err_data.get("code", "")
+                            msg = str(err_data.get("message", ""))
+                        except Exception:
+                            code, msg = "", ""
+
+                        if code == "NoRoute" or "impossible route" in msg.lower():
+                            raise NoRouteFoundError(
+                                "No driving route could be found between the selected locations."
+                            )
+                        raise NoRouteFoundError(
+                            "Selected coordinates are unroutable or invalid."
+                        )
                     if resp.status_code >= 500:
-                        raise RoutingError(f"OSRM server error: {resp.status_code}")
+                        raise RoutingError("Routing service is temporarily unavailable.")
 
                     resp.raise_for_status()
                     data = resp.json()
@@ -94,6 +107,7 @@ class OsrmProvider(RoutingProvider):
                 raise
             except Exception as e:
                 logger.error("OSRM unexpected error: %s", e)
-                raise RoutingError(f"OSRM routing failed: {e}") from e
+                raise RoutingError("Routing service request failed.") from e
 
-        raise RoutingError(f"OSRM unavailable after retry: {last_err}")
+        raise RoutingError("Routing service is temporarily unreachable.")
+

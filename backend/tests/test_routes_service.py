@@ -77,3 +77,22 @@ def test_relabel_and_index_routes():
     assert relabeled[1].id == "r2"
     assert relabeled[1].label == "Alternative 1"
     assert relabeled[1].duration_seconds == 60000
+
+
+def test_route_service_human_readable_no_route_error():
+    from backend.providers.base import NoRouteFoundError
+
+    class UnroutablePrimary:
+        def get_routes(self, origin, destination, weight_lb):
+            raise NoRouteFoundError("Valhalla no route")
+
+    class UnroutableFallback:
+        def get_routes(self, origin, destination, weight_lb, via_waypoints=None):
+            raise NoRouteFoundError("No driving route could be found between the selected locations.")
+
+    service = RouteService(primary_provider=UnroutablePrimary(), fallback_provider=UnroutableFallback())
+    with pytest.raises(NoRouteFoundError) as exc_info:
+        service.get_diverse_routes(LatLng(0, 0), LatLng(10, 10), 40000.0)
+
+    assert "No viable driving route could be found" in str(exc_info.value)
+

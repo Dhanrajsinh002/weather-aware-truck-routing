@@ -6,7 +6,7 @@ import logging
 from typing import List, Sequence, Tuple
 from backend.core.geo import haversine_distance_miles
 from backend.core.types import LatLng, Route
-from backend.providers.base import RoutingError, RoutingProvider
+from backend.providers.base import NoRouteFoundError, RoutingError, RoutingProvider
 from backend.providers.osrm import OsrmProvider
 from backend.providers.valhalla import ValhallaProvider
 
@@ -98,9 +98,32 @@ class RouteService:
             logger.warning("Primary routing provider failed, attempting fallback: %s", e)
             try:
                 routes = self.fallback.get_routes(origin, destination, weight_lb)
+            except NoRouteFoundError as nr_err:
+                logger.warning("Fallback routing found no route: %s", nr_err)
+                raise NoRouteFoundError(
+                    "No viable driving route could be found between the selected locations. Please check your origin and destination."
+                ) from nr_err
             except Exception as fb_err:
                 logger.error("Fallback routing provider also failed: %s", fb_err)
-                raise RoutingError(f"All routing providers failed. {fb_err}") from fb_err
+                if isinstance(e, NoRouteFoundError):
+                    raise NoRouteFoundError(
+                        "No viable driving route could be found between the selected locations. Please check your origin and destination."
+                    ) from e
+
+                combined_msg = f"{e} {fb_err}".lower()
+                if any(k in combined_msg for k in ["noroute", "no route", "unroutable", "impossible route"]):
+                    raise NoRouteFoundError(
+                        "No viable driving route could be found between the selected locations. Please check your origin and destination."
+                    ) from fb_err
+
+                raise RoutingError(
+                    "Routing services are temporarily unavailable. Please try again shortly."
+                ) from fb_err
+
+        if not routes:
+            raise NoRouteFoundError(
+                "No viable driving route could be found between the selected locations. Please check your origin and destination."
+            )
 
         # De-duplicate
         unique_routes = deduplicate_routes(routes)

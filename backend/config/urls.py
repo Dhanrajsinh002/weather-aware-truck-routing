@@ -2,6 +2,11 @@
 
 from django.urls import include, path
 
+try:
+    from backend.api import urls as api_urls
+except ModuleNotFoundError:
+    from api import urls as api_urls
+
 urlpatterns = [
-    path("api/", include("backend.api.urls")),
+    path("api/", include(api_urls)),
 ]

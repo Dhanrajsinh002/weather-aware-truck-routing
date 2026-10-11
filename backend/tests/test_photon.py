@@ -28,3 +28,26 @@ def test_parse_photon_fixture():
     assert results[1].label == "Denver, Colorado, United States"
     assert results[1].lat == 39.7392
     assert results[1].lng == -104.9903
+
+
+def test_photon_fallback_on_network_error(monkeypatch):
+    import httpx
+
+    def mock_get(*args, **kwargs):
+        raise httpx.ConnectError("Network unreachable")
+
+    monkeypatch.setattr(httpx.Client, "get", mock_get)
+
+    provider = PhotonProvider()
+    results = provider.search("Chicago")
+    assert len(results) >= 1
+    assert any("Chicago" in r.label for r in results)
+
+    results_ra = provider.search("Ra")
+    assert len(results_ra) >= 1
+    assert any("Raleigh" in r.label or "Rapid" in r.label for r in results_ra)
+
+    # Unknown query falls back gracefully without 502/exception
+    unknown = provider.search("zz_completely_nonexistent_query")
+    assert unknown == []
+

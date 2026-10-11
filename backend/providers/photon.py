@@ -1,0 +1,85 @@
+"""Photon geocoding provider adapter."""
+
+from __future__ import annotations
+
+import logging
+from typing import Any, Dict, List
+import httpx
+
+from backend.providers.base import GeocodeError, GeocodeProvider, GeocodeResult
+
+logger = logging.getLogger(__name__)
+
+DEFAULT_PHOTON_URL = "https://photon.komoot.io/api"
+DEFAULT_TIMEOUT_SECONDS = 10.0
+
+
+def format_photon_label(props: Dict[str, Any]) -> str:
+    """Format Photon feature properties into a clean display label."""
+    parts: List[str] = []
+    name = props.get("name")
+    if name:
+        parts.append(str(name))
+
+    city = props.get("city")
+    if city and city != name and city not in parts:
+        parts.append(str(city))
+
+    state = props.get("state")
+    if state and state not in parts:
+        parts.append(str(state))
+
+    country = props.get("country")
+    if country and country not in parts:
+        parts.append(str(country))
+
+    return ", ".join(parts) if parts else "Unknown Location"
+
+
+class PhotonProvider(GeocodeProvider):
+    """Adapter for Photon geocoding service."""
+
+    def __init__(self, base_url: str = DEFAULT_PHOTON_URL, timeout: float = DEFAULT_TIMEOUT_SECONDS):
+        self.base_url = base_url
+        self.timeout = timeout
+
+    def _parse_response(self, data: Dict[str, Any]) -> List[GeocodeResult]:
+        features = data.get("features", [])
+        results: List[GeocodeResult] = []
+
+        for feat in features:
+            geom = feat.get("geometry", {})
+            coords = geom.get("coordinates", [])
+            if len(coords) < 2:
+                continue
+            lon, lat = coords[0], coords[1]
+            props = feat.get("properties", {})
+            label = format_photon_label(props)
+
+            results.append(
+                GeocodeResult(
+                    label=label,
+                    lat=round(float(lat), 5),
+                    lng=round(float(lon), 5),
+                )
+            )
+
+        return results
+
+    def search(self, query: str, limit: int = 10) -> List[GeocodeResult]:
+        """Search Photon for query string."""
+        trimmed = query.strip()
+        if not trimmed or len(trimmed) < 2:
+            return []
+
+        params = {"q": trimmed, "limit": limit}
+
+        try:
+            with httpx.Client(timeout=self.timeout) as client:
+                resp = client.get(self.base_url, params=params)
+                resp.raise_for_status()
+                data = resp.json()
+                return self._parse_response(data)
+        except Exception as e:
+            logger.error("Photon geocode request failed: %s", e)
+            raise GeocodeError(f"Geocoding upstream failed: {e}") from e

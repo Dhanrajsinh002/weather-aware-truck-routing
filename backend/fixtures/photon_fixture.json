@@ -1,0 +1,35 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "coordinates": [-87.6298, 41.8781],
+        "type": "Point"
+      },
+      "properties": {
+        "name": "Chicago",
+        "state": "Illinois",
+        "country": "United States",
+        "countrycode": "US",
+        "osm_type": "N",
+        "osm_id": 26899042
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "coordinates": [-104.9903, 39.7392],
+        "type": "Point"
+      },
+      "properties": {
+        "name": "Denver",
+        "state": "Colorado",
+        "country": "United States",
+        "countrycode": "US",
+        "osm_type": "N",
+        "osm_id": 26899043
+      }
+    }
+  ]
+}

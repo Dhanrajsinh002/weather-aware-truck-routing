@@ -1,0 +1,47 @@
+{
+  "trip": {
+    "locations": [
+      { "lat": 41.8781, "lon": -87.6298, "type": "break" },
+      { "lat": 39.7392, "lon": -104.9903, "type": "break" }
+    ],
+    "legs": [
+      {
+        "shape": "gd`{nAn}ncfDflzTnhnZ~inO~_c~M~we{Av{~gP",
+        "summary": { "length": 1003.2, "time": 54000.0 }
+      }
+    ],
+    "summary": { "length": 1003.2, "time": 54000.0 }
+  },
+  "alternates": [
+    {
+      "trip": {
+        "locations": [
+          { "lat": 41.8781, "lon": -87.6298, "type": "break" },
+          { "lat": 39.7392, "lon": -104.9903, "type": "break" }
+        ],
+        "legs": [
+          {
+            "shape": "gd`{nAn}ncfD~pqhD~zbgLw_`f@fjnzR",
+            "summary": { "length": 1052.8, "time": 57600.0 }
+          }
+        ],
+        "summary": { "length": 1052.8, "time": 57600.0 }
+      }
+    },
+    {
+      "trip": {
+        "locations": [
+          { "lat": 41.8781, "lon": -87.6298, "type": "break" },
+          { "lat": 39.7392, "lon": -104.9903, "type": "break" }
+        ],
+        "legs": [
+          {
+            "shape": "gd`{nAn}ncfDnx`l@~~ex_@vvntAffkI",
+            "summary": { "length": 1089.4, "time": 59400.0 }
+          }
+        ],
+        "summary": { "length": 1089.4, "time": 59400.0 }
+      }
+    }
+  ]
+}

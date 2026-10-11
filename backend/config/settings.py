@@ -1,9 +1,17 @@
 """Django settings for weather-aware truck routing backend."""
 
 import os
+import sys
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
+REPO_ROOT = BASE_DIR.parent
+
+# Ensure both repo root and backend dir are in sys.path
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "django-insecure-spotter-weather-truck-routing-secret")
 DEBUG = os.environ.get("DEBUG", "1") == "1"

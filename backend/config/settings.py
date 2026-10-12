@@ -18,6 +18,7 @@ DEBUG = os.environ.get("DEBUG", "1") == "1"
 ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
+    "django.contrib.staticfiles",
     "django.contrib.contenttypes",
     "corsheaders",
     "rest_framework",
@@ -26,11 +27,29 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.common.CommonMiddleware",
 ]
+
+# Enable WhiteNoise static asset serving if installed
+try:
+    import whitenoise  # noqa: F401
+    MIDDLEWARE.append("whitenoise.middleware.WhiteNoiseMiddleware")
+except ImportError:
+    pass
+
+MIDDLEWARE.append("django.middleware.common.CommonMiddleware")
 
 ROOT_URLCONF = "backend.config.urls"
 WSGI_APPLICATION = "backend.config.wsgi.application"
+
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = "/static/"
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+# WhiteNoise configuration to serve built React frontend from root URL
+FRONTEND_DIST_DIR = REPO_ROOT / "frontend" / "dist"
+if FRONTEND_DIST_DIR.exists():
+    WHITENOISE_ROOT = FRONTEND_DIST_DIR
+    WHITENOISE_INDEX_FILE = True
 
 # Stateless in-memory cache for weather deduplication
 CACHES = {

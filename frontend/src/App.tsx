@@ -7,7 +7,7 @@ import { CheckpointList } from './features/results/CheckpointList';
 import { MapContainer } from './features/map/MapContainer';
 import { HeatmapSlider } from './features/heatmap/HeatmapSlider';
 import { useTripContext } from './context/TripContext';
-import { SlidersHorizontal, Map, ListCollapse } from 'lucide-react';
+import { SlidersHorizontal, Map, ListCollapse, List } from 'lucide-react';
 
 export const AppContent: React.FC = () => {
   const { tripData } = useTripContext();
@@ -53,7 +53,7 @@ export const AppContent: React.FC = () => {
                   className="edit-trip-toggle-btn"
                   onClick={() => setShowEditForm((prev) => !prev)}
                 >
-                  <ListCollapse size={16} />
+                  {showEditForm ? <ListCollapse size={16} /> : <List size={16}/>}
                   <span>{showEditForm ? 'Hide Trip Parameters' : 'Edit Trip & Recalculate'}</span>
                 </button>
               </div>

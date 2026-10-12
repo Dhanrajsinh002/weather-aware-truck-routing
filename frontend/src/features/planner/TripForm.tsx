@@ -176,7 +176,7 @@ export const TripForm: React.FC = () => {
           iconColor="#10b981"
         />
 
-        <div className="swap-button-row">
+        <div className="swap-button-row" style={{ margin: "0.35rem" }}>
           <button
             type="button"
             className="swap-btn"

@@ -320,3 +320,17 @@ If you wish to demo or test the React UI without running the Django backend:
    - `Wind 35–44 mph` and `load > 40,000 lb`: Escalates to `SEVERE`.
 3. **Route Ranking Criteria**:
    - Evaluated lexicographically by: `(no_travel_miles, severe_miles, high_miles, avg_risk, duration_seconds)`.
+
+---
+
+## 📚 Documentation
+
+For in-depth technical specifications and architectural rationale, refer to the documents in [`docs/`](docs/):
+
+- [Architecture & Request Flow](docs/ARCHITECTURE.md): System mermaid diagram, architectural layers, end-to-end `POST /api/analyze/` flow, and directory tree.
+- [Business Assumptions & Rules](docs/ASSUMPTIONS.md): Implemented threshold boundaries, cargo blowover rules, segment ownership, and verifying tests.
+- [API Specification](docs/API.md): Endpoint contracts, request/response examples generated via fixture mode, error structures, and environment variables.
+- [Third-Party Providers & Attributions](docs/PROVIDERS.md): APIs used (Valhalla, OSRM, Open-Meteo, Photon), licenses, caching, retries, fallbacks, and UI attributions.
+- [Architecture Decisions & Trade-Offs](docs/DECISIONS.md): Technical choices, alternatives considered, known limitations, and reviewer FAQ.
+- [Testing & Quality Assurance](docs/TESTING.md): Real test pass counts, suite coverage, boundary tests, and fixture mode verification.
+- [Local Development Guide](docs/DEVELOPMENT.md): Prerequisites, local backend/frontend setup, Vite proxy, mock mode, and production serving.
